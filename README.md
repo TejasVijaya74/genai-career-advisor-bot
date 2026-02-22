@@ -13,4 +13,10 @@ User -> UI (Streamlit) -> Backend Layer -> Prompt Engineering Module -> Gemini A
 5. Run the application: `streamlit run app.py`
 
 ## Deployment
-(We will document the AWS EC2 deployment steps here once completed).
+This application is deployed publicly on an AWS EC2 instance.
+
+1. **Provisioning**: Launched an Ubuntu EC2 instance with public IP accessibility.
+2. **Networking**: Configured a basic security group to ensure proper port exposure (Port 8501 for Streamlit).
+3. **Environment Setup**: Cloned the repository and installed dependencies inside a Python virtual environment.
+4. **Configuration**: Set up environment variable configuration securely via a `.env` file.
+5. **Execution**: Started the application using background process execution (`nohup streamlit run app.py &`).
