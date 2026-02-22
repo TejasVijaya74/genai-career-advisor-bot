@@ -1,7 +1,8 @@
 # api_handler.py
 import os
 import logging
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 from prompts import CAREER_ADVISOR_PROMPT
 
@@ -16,17 +17,20 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise ValueError("Missing API Key. Check .env file.")
 
-genai.configure(api_key=API_KEY)
-
 class ChatBackend:
     def __init__(self):
         try:
-            self.model = genai.GenerativeModel(
-                model_name="gemini-1.5-flash",
-                system_instruction=CAREER_ADVISOR_PROMPT
+            # Initialize the new genai Client
+            self.client = genai.Client(api_key=API_KEY)
+            
+            # Start a chat session using the new configuration format
+            self.chat_session = self.client.chats.create(
+                model="gemini-2.5-flash",
+                config=types.GenerateContentConfig(
+                    system_instruction=CAREER_ADVISOR_PROMPT,
+                    temperature=0.7
+                )
             )
-            # Maintain structured chat history
-            self.chat_session = self.model.start_chat(history=[])
             logger.info("Gemini API initialized successfully.")
         except Exception as e:
             logger.error(f"Initialization error: {e}")
@@ -35,9 +39,9 @@ class ChatBackend:
     def get_response(self, user_input):
         try:
             logger.info("Sending request to Gemini API...")
+            # The send_message method remains largely the same
             response = self.chat_session.send_message(user_input)
             return response.text
         except Exception as e:
             logger.error(f"API Call Failed: {e}")
-            # Proper exception handling and fallback mechanism
             return "I am currently experiencing technical difficulties. Please try again later."
